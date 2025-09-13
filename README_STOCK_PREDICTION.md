@@ -1,10 +1,11 @@
 # Stock Price Prediction Implementation using FinRL
 
-This implementation provides a comprehensive stock price prediction system built on top of the FinRL framework. The solution includes data simulation, feature engineering, machine learning models, evaluation metrics, and comparison with baseline models.
+This implementation provides a comprehensive stock price prediction system built on top of the FinRL framework. The solution uses real market data from Yahoo Finance and includes feature engineering, machine learning models, evaluation metrics, and comparison with baseline models.
 
 ## 🚀 Features
 
-- **Data Simulation**: Realistic stock price data generation when external data sources are unavailable
+- **Real Market Data**: Fetches live stock data using Yahoo Finance API (yfinance)
+- **Data Fallback**: Automatic fallback to realistic simulation if real data is unavailable
 - **Technical Indicators**: RSI, Moving Averages, Volatility calculations
 - **Machine Learning Model**: Simple linear regression with gradient descent
 - **Evaluation Metrics**: RMSE, MAE, MAPE, Directional Accuracy, Correlation
@@ -32,7 +33,7 @@ python stock_prediction_demo.py
 ```
 
 This will:
-- Fetch simulated data for AAPL from 2023-01-01 to 2024-01-01
+- Fetch real market data for AAPL from 2023-01-01 to 2024-01-01 using Yahoo Finance
 - Engineer features with technical indicators
 - Train a linear regression model
 - Evaluate performance and show results

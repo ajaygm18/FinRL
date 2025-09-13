@@ -14,20 +14,20 @@ import json
 from typing import List
 
 from stock_prediction_demo import (
-    StockDataSimulator, TechnicalIndicators, SimpleMLModel, StockPredictor
+    StockDataFetcher, TechnicalIndicators, SimpleMLModel, StockPredictor
 )
 from evaluation_suite import BaselineModels, ModelEvaluator
 
 
-class TestStockDataSimulator(unittest.TestCase):
-    """Test stock data simulation"""
+class TestStockDataFetcher(unittest.TestCase):
+    """Test stock data fetching"""
     
     def setUp(self):
-        self.simulator = StockDataSimulator("TEST", "2023-01-01", "2023-01-10")
+        self.fetcher = StockDataFetcher("TEST", "2023-01-01", "2023-01-10")
     
     def test_data_generation(self):
         """Test that data is generated correctly"""
-        data = self.simulator.generate_realistic_data()
+        data = self.fetcher.generate_realistic_data()
         
         # Check data structure
         self.assertIsInstance(data, list)
@@ -53,7 +53,7 @@ class TestStockDataSimulator(unittest.TestCase):
     
     def test_date_range(self):
         """Test that data covers the correct date range"""
-        data = self.simulator.generate_realistic_data()
+        data = self.fetcher.generate_realistic_data()
         
         first_date = data[0]['date']
         last_date = data[-1]['date']

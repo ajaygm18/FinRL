@@ -3,9 +3,9 @@
 Stock Price Prediction Demo using FinRL Framework
 =================================================
 
-This script demonstrates stock price prediction using a simplified approach
-that works with basic Python libraries. It includes:
-1. Data fetching simulation (since network issues prevent real data download)
+This script demonstrates stock price prediction using real market data
+from Yahoo Finance. It includes:
+1. Real data fetching using yfinance (with simulated fallback)
 2. Feature engineering and preprocessing
 3. Machine learning model training
 4. Prediction and evaluation
@@ -25,9 +25,18 @@ from typing import Dict, List, Tuple
 import os
 import pickle
 
+# Try to import yfinance for real data, fallback to simulation if not available
+try:
+    import yfinance as yf
+    YFINANCE_AVAILABLE = True
+    print("yfinance available - will use real stock data")
+except ImportError:
+    YFINANCE_AVAILABLE = False
+    print("yfinance not available - will use simulated data")
 
-class StockDataSimulator:
-    """Simulate stock data when real data fetching is not available"""
+
+class StockDataFetcher:
+    """Fetch real or simulated stock data"""
     
     def __init__(self, ticker: str, start_date: str, end_date: str):
         self.ticker = ticker
@@ -35,8 +44,49 @@ class StockDataSimulator:
         self.end_date = datetime.strptime(end_date, '%Y-%m-%d')
         self.data = []
         
+    def fetch_real_data(self) -> List[Dict]:
+        """Fetch real stock data using yfinance"""
+        if not YFINANCE_AVAILABLE:
+            raise ImportError("yfinance not available for real data fetching")
+        
+        try:
+            print(f"Fetching real data for {self.ticker}...")
+            ticker_obj = yf.Ticker(self.ticker)
+            
+            # Fetch data for the specified period
+            hist_data = ticker_obj.history(
+                start=self.start_date.strftime('%Y-%m-%d'),
+                end=(self.end_date + timedelta(days=1)).strftime('%Y-%m-%d')  # +1 to include end_date
+            )
+            
+            if hist_data.empty:
+                raise ValueError(f"No data available for {self.ticker} in the specified date range")
+            
+            # Convert to our format
+            data = []
+            for date, row in hist_data.iterrows():
+                data.append({
+                    'date': date.strftime('%Y-%m-%d'),
+                    'ticker': self.ticker,
+                    'open': round(float(row['Open']), 2),
+                    'high': round(float(row['High']), 2),
+                    'low': round(float(row['Low']), 2),
+                    'close': round(float(row['Close']), 2),
+                    'volume': int(row['Volume']) if not math.isnan(row['Volume']) else 1000000
+                })
+            
+            print(f"Successfully fetched {len(data)} days of real data for {self.ticker}")
+            self.data = data
+            return data
+            
+        except Exception as e:
+            print(f"Error fetching real data: {e}")
+            print("Falling back to simulated data...")
+            return self.generate_realistic_data()
+    
     def generate_realistic_data(self) -> List[Dict]:
         """Generate realistic stock price data with trends and volatility"""
+        print(f"Generating simulated data for {self.ticker}...")
         random.seed(42)  # For reproducible results
         
         current_date = self.start_date
@@ -77,6 +127,7 @@ class StockDataSimulator:
             
             current_date += timedelta(days=1)
             
+        print(f"Generated {len(self.data)} days of simulated data for {self.ticker}")
         return self.data
 
 
@@ -247,14 +298,24 @@ class StockPredictor:
         self.features = None
         self.targets = None
         
-    def fetch_data(self, start_date: str, end_date: str) -> List[Dict]:
-        """Fetch stock data (simulated for this demo)"""
+    def fetch_data(self, start_date: str, end_date: str, use_real_data: bool = True) -> List[Dict]:
+        """Fetch stock data (real data preferred, simulated as fallback)"""
         print(f"Fetching data for {self.ticker} from {start_date} to {end_date}")
         
-        simulator = StockDataSimulator(self.ticker, start_date, end_date)
-        self.data = simulator.generate_realistic_data()
+        fetcher = StockDataFetcher(self.ticker, start_date, end_date)
         
-        print(f"Fetched {len(self.data)} data points")
+        if use_real_data and YFINANCE_AVAILABLE:
+            try:
+                self.data = fetcher.fetch_real_data()
+            except Exception as e:
+                print(f"Failed to fetch real data: {e}")
+                print("Using simulated data as fallback...")
+                self.data = fetcher.generate_realistic_data()
+        else:
+            print("Using simulated data...")
+            self.data = fetcher.generate_realistic_data()
+        
+        print(f"Loaded {len(self.data)} data points")
         return self.data
     
     def engineer_features(self, lookback_days: int = 10) -> Tuple[List[List[float]], List[float]]:
@@ -357,7 +418,7 @@ class StockPredictor:
             if pred_direction == actual_direction:
                 correct_direction += 1
         
-        directional_accuracy = correct_direction / (len(predictions) - 1) if len(predictions) > 1 else 0
+        directional_accuracy = (correct_direction / (len(predictions) - 1)) * 100 if len(predictions) > 1 else 0
         
         # Mean actual price for relative metrics
         mean_price = sum(y_test) / len(y_test)
@@ -444,7 +505,7 @@ def main():
         print(f"Root Mean Square Error (RMSE): ${metrics['rmse']:.2f}")
         print(f"Mean Absolute Error (MAE): ${metrics['mae']:.2f}")
         print(f"Mean Absolute Percentage Error (MAPE): {metrics['mape']:.2f}%")
-        print(f"Directional Accuracy: {metrics['directional_accuracy']:.1%}")
+        print(f"Directional Accuracy: {metrics['directional_accuracy']:.1f}%")
         
         print(f"\nSample Predictions vs Actuals:")
         print("Predicted | Actual    | Difference")
