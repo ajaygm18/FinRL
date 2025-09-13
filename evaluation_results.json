@@ -1,0 +1,44 @@
+{
+  "ML Model (AAPL)": {
+    "model_name": "ML Model (AAPL)",
+    "rmse": 2.1867152019836533,
+    "mae": 1.7374763447873056,
+    "mape": 1.5063346038253842,
+    "directional_accuracy": 0.5285714285714286,
+    "correlation": 0.9746293015757724,
+    "max_error": 5.521782755335025,
+    "min_error": 0.020748490497382477,
+    "within_1pct": 0.4647887323943662,
+    "within_5pct": 1.0,
+    "within_10pct": 1.0,
+    "samples": 71
+  },
+  "ML Model (GOOGL)": {
+    "model_name": "ML Model (GOOGL)",
+    "rmse": 2.1867152019836533,
+    "mae": 1.7374763447873056,
+    "mape": 1.5063346038253842,
+    "directional_accuracy": 0.5285714285714286,
+    "correlation": 0.9746293015757724,
+    "max_error": 5.521782755335025,
+    "min_error": 0.020748490497382477,
+    "within_1pct": 0.4647887323943662,
+    "within_5pct": 1.0,
+    "within_10pct": 1.0,
+    "samples": 71
+  },
+  "ML Model (MSFT)": {
+    "model_name": "ML Model (MSFT)",
+    "rmse": 2.1867152019836533,
+    "mae": 1.7374763447873056,
+    "mape": 1.5063346038253842,
+    "directional_accuracy": 0.5285714285714286,
+    "correlation": 0.9746293015757724,
+    "max_error": 5.521782755335025,
+    "min_error": 0.020748490497382477,
+    "within_1pct": 0.4647887323943662,
+    "within_5pct": 1.0,
+    "within_10pct": 1.0,
+    "samples": 71
+  }
+}
